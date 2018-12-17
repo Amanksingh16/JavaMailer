@@ -6,6 +6,7 @@
 <%@page import="java.sql.Connection"%>
 <html>
     <head>
+        <link rel="icon" type="image/ico" href="resources/mail.png" />
         <title>Mailer</title>
         <style>
             body{
@@ -72,6 +73,8 @@
                         request.getSession().setAttribute("to",15);
                         request.getSession().setAttribute("from1",1);
                         request.getSession().setAttribute("to1",10);
+                        request.getSession().setAttribute("from2",1);
+                        request.getSession().setAttribute("to2",10);
                         %>
                         <div class="container-fluid text-center">
             <h1 class="display-5" style="margin: 0 auto;">Loading <b style="color: maroon; font-family: cursive;">M</b>ailer</h1>

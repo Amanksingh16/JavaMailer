@@ -16,7 +16,7 @@
 <%@page import="java.sql.DriverManager"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%
-    int i = 0,j=0,k=0,from=0,to=0,from1=0,to1=0;
+    int i = 0,j=0,k=0,from=0,to=0,from1=0,to1=0,from2=0,to2=0;
     Message[] messages = null;
     Message[] messages1 = null;
     Message[] messages2 = null;
@@ -26,6 +26,9 @@
     String[] msgto = new String[500];
     String[] subject1 = new String[500];
     String[] date1 = new String[500];    
+    String[] msgfrom2 = new String[100];
+    String[] subject2 = new String[100];
+    String[] date2 = new String[100];
     String user="",path="",gender="",email="",phone="",dob="";
     ServletContext context = request.getServletContext();
              Connection con;
@@ -69,6 +72,8 @@
             to = Integer.parseInt(session.getAttribute("to").toString());
             from1 = Integer.parseInt(session.getAttribute("from1").toString());
             to1 = Integer.parseInt(session.getAttribute("to1").toString());
+                        from2 = Integer.parseInt(session.getAttribute("from2").toString());
+            to2 = Integer.parseInt(session.getAttribute("to2").toString());
             
         try {
             // connects to the message store
@@ -80,9 +85,11 @@
             Folder foldertrash = store.getFolder("[Gmail]/Trash");
             folderInbox.open(Folder.READ_WRITE);
             foldersent.open(Folder.READ_ONLY);
+            foldertrash.open(Folder.READ_ONLY);
             
             messages = folderInbox.getMessages();
             messages1 = foldersent.getMessages();
+            messages2 = foldertrash.getMessages();
             
              for (i = messages.length-from; i >= messages.length-to; i--) 
              {   
@@ -95,20 +102,36 @@
              
              for (j = messages1.length-from1; j >= messages1.length-to1; j--) 
              {   
-                Message msg = messages1[j];
+                if(j<0)
+                {
+                    break;
+                }
+                 Message msg = messages1[j];
                 Address[] fromAddress = msg.getAllRecipients();
                 msgto[j] = fromAddress[0].toString();
                 subject1[j] = msg.getSubject();
                 date1[j] = msg.getSentDate().toString();
              }
+             if(messages2.length!=0)
+             {
+                              for (k = messages2.length-from2; k >= messages2.length-to2; k--) 
+             {   
+                Message msg = messages2[k];
+                Address[] fromAddress = msg.getAllRecipients();
+                msgto[k] = fromAddress[0].toString();
+                subject1[k] = msg.getSubject();
+                date1[k] = msg.getSentDate().toString();
+             }   
+             }
+             
             folderInbox.close(false);
             foldersent.close(false);
+            foldertrash.close(false);
             store.close();
         }
         catch(Exception e)
         {
-                       session.invalidate();
-                       response.sendRedirect("http://localhost:8080/JavaMailer/");
+                       out.println(e);
         }
 }
 %>
@@ -137,6 +160,7 @@ private Properties getServerProperties(String protocol, String host,
 %>
 <html>
     <head>
+        <link rel="icon" type="image/ico" href="resources/mail.png" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Mailer</title>
             <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
@@ -189,13 +213,10 @@ private Properties getServerProperties(String protocol, String host,
   
  <ul class="navbar-nav">
     <li class="nav-item">
-      <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">Home</a>
+      <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="main.jsp">Home</a>
     </li>
     <li class="nav-item">
       <a style="color:white; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">About</a>
-    </li>
-    <li class="nav-item">
-      <a style="color:white; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">Contact</a>
     </li>
   </ul>
 
@@ -220,21 +241,18 @@ private Properties getServerProperties(String protocol, String host,
             <div class="row">
                 <div class="col-md-3 text-center">
       <ul class="list-group">
-          <a href="#" data-target="#email" data-toggle="modal"><li class="list-group-item" style="margin-left: 12px; margin-top: 10px; background-color: darkred; color: gold; font-family: cursive; font-weight: bold; border:0;">Compose a new mail <i style="margin:5px;" class="fa fa-check-square-o"></i></li></a>
+          <a href="#" style="text-decoration: none;" data-target="#email" data-toggle="modal"><li class="list-group-item" style="margin-left: 12px; margin-top: 10px; background-color: darkred; color: gold; font-family: cursive; font-weight: bold; border:0;">Compose a new mail <i style="margin:5px;" class="fa fa-check-square-o"></i></li></a>
 </ul>
                     <form name="vinform" style="margin: 0 auto;">
      <input type="text" name="t1" class="form-control" style="border: 5px solid palevioletred; margin-left: 12px; margin-top: 10px; margin-bottom: 5px; padding: 25px; width:305px;" onkeyup="sendInfo()" placeholder="Search Users">
   </form>
                     <div class="list-group" id="list-tab" role="tablist" style="margin-left: 12px; border: 5px solid darkslateblue; border-radius: 7px;">
-       <a style="color: green; border-bottom: 5px solid darkslateblue; font-size: 17px; font-family: cursive; padding: 15px;" class="list-group-item list-group-item-action" id="list-search-list" data-toggle="list" href="#list-search" role="tab"><i style="margin:5px;" class="fa fa-search"></i>  Search</a>
+       <a style="color: springgreen; border-bottom: 5px solid darkslateblue; font-size: 17px; font-family: cursive; padding: 15px;" class="list-group-item list-group-item-action" id="list-search-list" data-toggle="list" href="#list-search" role="tab"><i style="margin:5px;" class="fa fa-search"></i>  Search</a>
        <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home"><i style="margin:5px;" class="fa fa-inbox"></i>  Inbox</a>
       <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile"><i style="margin:5px;" class="fa fa-user"></i>  Profile</a>
       <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages"><i style="margin:5px;" class="fa fa-share-square-o"></i>  Sent Mails</a>
-      <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings"><i style="margin:5px;" class="fa fa-trash"></i>  Trash</a>
-      <a style="padding: 17px;" class="list-group-item" id="list-settings-list" data-toggle="modal" data-target="#modal2" href="#" aria-controls="settings"><i style="margin:5px;" class="fa fa-scissors"></i>  Delete mail</a>
-    
-    </div>
-       
+      <a style="padding: 17px;" class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings"><i style="margin:5px;" class="fa fa-trash"></i>  Trash</a>
+    </div>      
   </div>
                 
                 <div class="col-md-9" style="background-color: beige; border-left: 3px solid darkgray; ">
@@ -272,7 +290,7 @@ private Properties getServerProperties(String protocol, String host,
                   <tr>
                       <td style="font-weight: bold;"><%=from%></td>
             <td style="font-weight: bold;"><%=msgfrom[a]%></td>
-            <td style="font-weight: bold;"><a href="inbox.jsp?mail=<%=a%>"><%=subject[a]%></a></td>
+            <td style="font-weight: bold;"><a style="text-decoration: none;" href="inbox.jsp?mail=<%=a%>"><%=subject[a]%></a></td>
             <td style="font-weight: bold;"><%=date[a].substring(0,10)+" "+date[a].substring(23,28)%></td>
         </tr><%  
             from++;
@@ -308,6 +326,7 @@ out.println(e+"hello");}
                   <div class="col-md-8" style="padding: 25px;">
                       <table class="table table-borderless" style="margin: 10px;">
                           <tbody>
+                              <%try{%>
                               <tr>
                                   <th>Name</th>
                                   <td><%=user%></td>
@@ -336,6 +355,10 @@ out.println(e+"hello");}
                                   <th>Sent Mails</th>
                                   <td><%=messages1.length%></td>
                               </tr>
+                              <%}catch(Exception e)
+{
+      out.println(e);
+}%>
                           </tbody>
                       </table>
                               <br><br>
@@ -396,7 +419,62 @@ out.println(e+"hello");}
       </div>
       
       </div>
-      <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">...</div>
+      <div class="tab-pane fade" id="list-settings" role="tabpanel" aria-labelledby="list-settings-list">
+          <%
+              try{
+          if(messages2.length!=0)
+          {
+          %>
+          <table class="table table-bordered" style="width:95%; margin:0 auto;">
+              <thead class="thead-dark" id="msgs">
+      <tr>
+          <th style="width:60px;">Serial</th>
+          <th>From/to</th>
+          <th>Subject</th>
+        <th style="width:200px;">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+              <%
+                  int c = messages2.length-from2;
+                  
+      while(c>k)
+      {%>
+                  <tr>
+            <td style="font-weight: bold;"><%=from2%></td>          
+            <td style="font-weight: bold;"><%=msgfrom2[c]%></td>
+            <td style="font-weight: bold;"><%=subject2[c]%></td>
+            <td style="font-weight: bold;"><%=date2[c].substring(0,10)+" "+date2[c].substring(23,28)%></td>
+        </tr><%   
+            from2++;
+           c--;     
+           }
+      %>
+             
+    </tbody>
+          </table>
+<div class="row" style="margin: 10px;">
+    <div class="col-md-4"></div>
+          <div class="col-md-3">
+              <a href="previous?page=previous2" class="btn btn-success" style="font-weight: bold; padding:15px; margin: 0 auto; width:180px;"><i style="margin:5px;" class="fa fa-chevron-left"></i>Previous</a>
+          </div>
+          <div class="col-md-3">
+              <a href="next?page=next2" class="btn btn-success" style="font-weight: bold; padding:15px; margin: 0 auto; width:180px;">Next<i style="margin:5px;" class="fa fa-chevron-right"></i></a>
+          </div>
+      </div>
+          <%
+              }
+          else
+{
+    out.println("<p class='text-center'>There are no mails in the trash</p>");
+}
+}
+catch(NullPointerException e)
+{
+       out.println(e);
+}
+          %>
+      </div>
       
     </div>
   </div>
@@ -468,37 +546,11 @@ out.println(e+"hello");}
                   </div>
                       <div class="col-md-4">
                           <input type="reset" class="btn btn-danger" style="margin:10px; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 40px; padding-right: 40px;" id="rst" value="Reset">
-              
                       </div>
-              
-                              <div class="col-md-2">                    
-                  </div>
+                              <div class="col-md-2"></div>
                             </div>
                             </form>
-         
       </div>
-
-    </div>
-  </div>
-</div>
-      
-      <div class="modal video-modal fade" id="modal2">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-          <h3 style="color: darkblue; font-family: cursive;" class="modal-title">Delete Mail</h3>
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-
-      <div class="modal-body text-center" style="background-color: activeborder; padding: 10px;">
-          <b style="color: darkred; margin: 15px;">The Selected Mail shall be permanently deleted from your Gmail Account</b>
-          <br>
-          <form method="get"> 
-          <input type="number" style="margin: 0 auto; border:1px solid black; border-radius: 15px; padding: 20px; width: 350px;" class="form-control" placeholder="Serial ID of Mail" name="deletemail" required>
-              <input type="submit" value="Delete this Mail" style="margin:10px; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" class="btn btn-success">
-          </form>
-      </div>
-
     </div>
   </div>
 </div>

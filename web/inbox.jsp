@@ -88,23 +88,23 @@
         content = getTextFromMimeMultipart(part);
     }
     
-    if(request.getParameter("delete")!=null)
+        if(request.getParameter("deletemail")!=null)
           {
-     int s = Integer.parseInt(request.getParameter("delete"));
-     messages[messages.length-s].setFlag(Flags.Flag.DELETED, true);
+     int s = Integer.parseInt(request.getParameter("deletemail"));
+     messages[s].setFlag(Flags.Flag.DELETED, true);
 %><script>
     alert("Your Mail is Deleted");
 </script>
 <%
     response.sendRedirect("http://localhost:8080/JavaMailer/main.jsp");
-          }   
+          }
+       
             folderInbox.close(false);
             store.close();
         }
         catch(Exception e)
         {
-                       session.invalidate();
-                       response.sendRedirect("http://localhost:8080/JavaMailer/");
+                  out.println(e);
         }
 }
 %>
@@ -160,6 +160,7 @@ private Properties getServerProperties(String protocol, String host,
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
 <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css" />
+<link rel="icon" type="image/ico" href="resources/mail.png" />
 <style>
     ul li a:hover
     {
@@ -208,13 +209,10 @@ private Properties getServerProperties(String protocol, String host,
   
  <ul class="navbar-nav">
     <li class="nav-item">
-      <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">Home</a>
+      <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="main.jsp">Home</a>
     </li>
     <li class="nav-item">
       <a style="color:white; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">About</a>
-    </li>
-    <li class="nav-item">
-      <a style="color:white; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link" href="#">Contact</a>
     </li>
   </ul>
 
@@ -245,8 +243,14 @@ private Properties getServerProperties(String protocol, String host,
               <div class="row">
                   <div class="col-md-6"><h5 class="display-5" style="color: darkslateblue;">From : <%=msgfrom%></h5>
               </div>
-                  <div class="col-md-3"></div>
-                  <div class="col-md-3"><a href="inbox.jsp?mail=<%=mail%>" class="btn btn-danger" style="padding:10px;">Delete This Mail</a></div>
+                  <div class="col-md-2"></div>
+                  <div class="col-md-4">
+                      <form class="form text-center" method="get" onsubmit="deleted()">
+                          <input type="hidden" name="deletemail" value="<%=mail%>">
+                      <input type="submit" class="btn btn-danger" value="Delete This Mail" style="padding:10px; margin:0 auto;">
+                      <p style="color: blue;">Note: It will also be deleted from Gmail Account</p>
+                  </form>
+                  </div>
               </div>
               <br>
               <h6 class="display-5"><%=content%></h6>
@@ -276,9 +280,6 @@ private Properties getServerProperties(String protocol, String host,
            <script>
                 function deleted()
             {
-                      <%
-                          request.setAttribute("delete",mail);
-                      %>
                               window.location.reload();
             }
         

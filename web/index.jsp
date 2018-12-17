@@ -68,6 +68,7 @@ if(session.getAttribute("user")!=null)
     }
         
 </style>
+<link rel="icon" type="image/ico" href="resources/mail.png" />
     </head>
     <body>
         <div id="myCarousel" class="carousel slide" data-ride="carousel">
