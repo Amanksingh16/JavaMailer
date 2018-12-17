@@ -22,8 +22,6 @@
     Message[] messages2 = null;
     String[] msgfrom = new String[25000];
     String[] subject = new String[25000];
-    String[] content = new String[25000];
-    Multipart[] part = null;
     String[] date = new String[25000];
     String[] msgto = new String[500];
     String[] subject1 = new String[500];
@@ -91,14 +89,6 @@
                 Message msg = messages[i];
                 Address[] fromAddress = msg.getFrom();
                 msgfrom[i] = fromAddress[0].toString();
-                if(msg.getContentType().contains("multipart"))
-                {
-                    part[i] = (Multipart) msg.getContent();
-                }
-                else
-                {
-                    content[i] = msg.getContent().toString();    
-                }
                 subject[i] = msg.getSubject();
                 date[i] = msg.getSentDate().toString();
              }
@@ -111,24 +101,14 @@
                 subject1[j] = msg.getSubject();
                 date1[j] = msg.getSentDate().toString();
              }
-             
-          if(request.getParameter("deletemail")!=null)
-          {
-     int s = Integer.parseInt(request.getParameter("deletemail"));
-     messages[messages.length-s].setFlag(Flags.Flag.DELETED, true);
-%><script>
-    alert("Your Mail is Deleted");
-</script>
-<%
-          }   
             folderInbox.close(false);
             foldersent.close(false);
             store.close();
         }
         catch(Exception e)
         {
-                        session.invalidate();
-                        response.sendRedirect("http://localhost:8080/JavaMailer/index.jsp");
+                       session.invalidate();
+                       response.sendRedirect("http://localhost:8080/JavaMailer/");
         }
 }
 %>
@@ -240,17 +220,17 @@ private Properties getServerProperties(String protocol, String host,
             <div class="row">
                 <div class="col-md-3 text-center">
       <ul class="list-group">
-          <a href="#" data-target="#email" data-toggle="modal"><li class="list-group-item" style="margin-left: 12px; margin-top: 10px; background-color: darkred; color: gold; font-family: cursive; font-weight: bold;">Compose a new mail <i style="margin:5px;" class="fa fa-check-square-o"></i></li></a>
+          <a href="#" data-target="#email" data-toggle="modal"><li class="list-group-item" style="margin-left: 12px; margin-top: 10px; background-color: darkred; color: gold; font-family: cursive; font-weight: bold; border:0;">Compose a new mail <i style="margin:5px;" class="fa fa-check-square-o"></i></li></a>
 </ul>
                     <form name="vinform" style="margin: 0 auto;">
-     <input type="text" name="t1" class="form-control" style="border: 2px solid palevioletred; margin-left: 12px; margin-top: 10px; margin-bottom: 5px; padding: 20px; width:300px;" onkeyup="sendInfo()" placeholder="Search Users">
+     <input type="text" name="t1" class="form-control" style="border: 5px solid palevioletred; margin-left: 12px; margin-top: 10px; margin-bottom: 5px; padding: 25px; width:305px;" onkeyup="sendInfo()" placeholder="Search Users">
   </form>
-                    <div class="list-group" id="list-tab" role="tablist" style="margin-left: 12px; border-radius: 7px;">
-       <a style="background-color: limegreen; border-top-left-radius: 7px; border-top-right-radius: 7px; font-size: 17px; font-family: cursive; width: 120px; border-radius: 5px; margin:0 auto; padding: 8px;" class="list-group-item list-group-item-action" id="list-search-list" data-toggle="list" href="#list-search" role="tab"><i style="margin:5px;" class="fa fa-search"></i>  Search</a>
-      <a style="margin-top: 25px; padding: 17px;" class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home"><i style="margin:5px;" class="fa fa-inbox"></i>  Inbox</a>
-      <a style="padding: 17px;" class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile"><i style="margin:5px;" class="fa fa-user"></i>  Profile</a>
-      <a style="padding: 17px;" class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages"><i style="margin:5px;" class="fa fa-share-square-o"></i>  Sent Mails</a>
-      <a style="padding: 17px;" class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings"><i style="margin:5px;" class="fa fa-trash"></i>  Trash</a>
+                    <div class="list-group" id="list-tab" role="tablist" style="margin-left: 12px; border: 5px solid darkslateblue; border-radius: 7px;">
+       <a style="color: green; border-bottom: 5px solid darkslateblue; font-size: 17px; font-family: cursive; padding: 15px;" class="list-group-item list-group-item-action" id="list-search-list" data-toggle="list" href="#list-search" role="tab"><i style="margin:5px;" class="fa fa-search"></i>  Search</a>
+       <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home"><i style="margin:5px;" class="fa fa-inbox"></i>  Inbox</a>
+      <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile"><i style="margin:5px;" class="fa fa-user"></i>  Profile</a>
+      <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-messages-list" data-toggle="list" href="#list-messages" role="tab" aria-controls="messages"><i style="margin:5px;" class="fa fa-share-square-o"></i>  Sent Mails</a>
+      <a style="padding: 17px; border-bottom: 5px solid darkslateblue;" class="list-group-item list-group-item-action" id="list-settings-list" data-toggle="list" href="#list-settings" role="tab" aria-controls="settings"><i style="margin:5px;" class="fa fa-trash"></i>  Trash</a>
       <a style="padding: 17px;" class="list-group-item" id="list-settings-list" data-toggle="modal" data-target="#modal2" href="#" aria-controls="settings"><i style="margin:5px;" class="fa fa-scissors"></i>  Delete mail</a>
     
     </div>
@@ -292,7 +272,7 @@ private Properties getServerProperties(String protocol, String host,
                   <tr>
                       <td style="font-weight: bold;"><%=from%></td>
             <td style="font-weight: bold;"><%=msgfrom[a]%></td>
-            <td style="font-weight: bold;"><%=subject[a]%></td>
+            <td style="font-weight: bold;"><a href="inbox.jsp?mail=<%=a%>"><%=subject[a]%></a></td>
             <td style="font-weight: bold;"><%=date[a].substring(0,10)+" "+date[a].substring(23,28)%></td>
         </tr><%  
             from++;
@@ -522,21 +502,6 @@ out.println(e+"hello");}
     </div>
   </div>
 </div>
-      
-      <script>
-          function logout()
-          {
-             
-              <%
-              if(session.getAttribute("user")==null)
-              {
-                  %>alert("hello1");<%
-                  response.sendRedirect("http://localhost:8080/JavaMailer/");
-              }              
-              %>
-          }
-          window.onload() = logout;
-      </script>
       
 <script>  
 var request;  
