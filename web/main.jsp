@@ -29,7 +29,7 @@
     String[] msgfrom2 = new String[100];
     String[] subject2 = new String[100];
     String[] date2 = new String[100];
-    String user="",path="",gender="",email="",phone="",dob="";
+    String user="",last="",path="",gender="",email="",phone="",dob="";
     ServletContext context = request.getServletContext();
              Connection con;
      if(session.getAttribute("user")==null)
@@ -50,7 +50,8 @@
             ResultSet rs = ps.executeQuery();
             while(rs.next())
             {
-                user = rs.getString(1)+" "+rs.getString(2);
+                user = rs.getString(1);
+                last = rs.getString(2);
                 path = rs.getString(8);
                 gender = rs.getString(5);
                 phone = rs.getString(4);
@@ -111,6 +112,7 @@
                 msgto[j] = fromAddress[0].toString();
                 subject1[j] = msg.getSubject();
                 date1[j] = msg.getSentDate().toString();
+                
              }
              if(messages2.length!=0)
              {
@@ -131,7 +133,8 @@
         }
         catch(Exception e)
         {
-                       out.println(e);
+                 session.invalidate();
+                 response.sendRedirect("http://localhost:8080/JavaMailer/");
         }
 }
 %>
@@ -224,7 +227,7 @@ private Properties getServerProperties(String protocol, String host,
  <ul class="navbar-nav ml-auto">
      <a href="#" onclick="window.location.reload();" style="margin-right: 2px; border-radius:40%; padding:10px; font-family: cursive; font-weight: bold;" class="btn btn-secondary"><i class="fa fa-repeat"></i></a>
     <li class="nav-item dropdown">
-        <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%=user%></a>
+        <a style="color: tomato; margin-left: 20px; font-weight: bold; font-family: cursive;" class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><%=user+" "+last%></a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           <a class="dropdown-item" href="logout.jsp">Logout <i class="fa fa-share-square-o"></i></a>
         </div>
@@ -364,10 +367,10 @@ out.println(e+"hello");}
                               <br><br>
                               <div class="row">
                                   <div class="col-md-6">
-                              <a href="#" class="btn btn-success" style="margin: 0 auto; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="smbt">Edit Profile</a>
+                              <a href="#" data-toggle="modal" data-target="#edit" class="btn btn-success" style="margin: 0 auto; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="smbt">Edit Profile</a>
                                   </div>
                               <div class="col-md-6">
-                              <a href="#" class="btn btn-danger" style="margin: 0 auto; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="smbt">Delete Account</a>
+                              <a href="#" data-toggle="modal" data-target="#dlt" class="btn btn-danger" style="margin: 0 auto; border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="smbt">Delete Account</a>
                               </div>
                               </div>
                   </div>
@@ -479,7 +482,104 @@ catch(NullPointerException e)
     </div>
   </div>
 </div>
+
+                                <div class="modal video-modal fade" id="edit">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h3 style="color: darkblue; font-family: cursive;" class="modal-title">Mailer Login</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body text-center" style="background-color: activeborder;">
+          <form class="form" action="update" method="post" enctype="multipart/form-data">
+              <div class="row">
+                  <div class="col-md-2" style="font-family: cursive; font-size: 20px;">
+                      Name 
+                  </div>
+                  <div class="col-md-4">
+                      <input type="text" placeholder="Enter First Name" name="fname" class="form-control" id="fname" value="<%=user%>" required></div>                                   
+                      <div class="col-md-5">
+                      <input type="text" placeholder="Enter Last Name" name="lname" class="form-control" value="<%=last%>" id="lname" required>
+                  </div>
+                  <div class="col-md-1">
+                      </div>
+              </div>
+              
+              <div class="row">
+                  <div class="col-md-2" style="font-family: cursive; font-size: 20px;">
+                      Phone
+                  </div>
+                  <div class="col-md-10">
+                      <input type="number" value="<%=phone%>" placeholder="Enter Phone Number" name="phone" style="width: 250px;" class="form-control" id="phone" required></div>                                   
+              </div>
+              
+              
+              <div class="row">
+                  <div class="col-md-2" style="font-family: cursive; font-size: 20px;">
+                      Gender 
+                  </div>
+                  <div class="col-md-3">
+                  <select name="gender" value="<%=gender%>" style="width:150px; padding:0;" class="form-control">
+       <option> ---Select---</option>
+   <option  value="Male">Male </option>
+   <option  value="Female">Female </option>
+   </select>
+                  </div>
+                  <div class="col-md-3" style="font-family: cursive; font-size: 20px;">
+                      Date of Birth
+                  </div>
+                   <div class="col-md-4">
+                  <input type="date" name="dob" value="<%=dob%>" class="form-control" id="dob" required>
+              </div>            
+              </div>
+              
+                            <div class="row">
+                  <div class="col-md-2" style="font-family: cursive; font-size: 20px;">
+                      Profile 
+                  </div>
+                  <div class="col-md-10">
+                      <input type="file" name="profile" value="<%=path%>" class="form-control" style="padding:3px;" id="profile" required>
+                      </div>
+              </div>
+                      <div class="row" style="margin-top: 30px;">
+                  <div class="col-md-2"> 
+                  </div>                          
+                  <div class="col-md-4">
+                      <input type="submit" class="btn btn-success" style="border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="smbt" value="Update">
+                      </div>                          
+                  <div class="col-md-4">
+                      <input type="reset" class="btn btn-danger" style="border-radius:10px; padding-top: 15px; padding-bottom: 15px; padding-left: 45px; padding-right: 45px;" id="rst" value="Reset">
+                      </div>
+                                         <div class="col-md-2"> 
+                  </div>    
+              </div>
+          </form>
           
+      </div>
+    </div>
+  </div>
+</div>
+                      <div class="modal video-modal fade" id="dlt">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+          <h3 style="color: darkblue; font-family: cursive;" class="modal-title">Mailer Login</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="modal-body text-center" style="background-color: activeborder;">
+          <form class="form text-center" action="update" method="post">
+                   Are You Sure You want to Permanently Delete this Account?
+                   <br>
+                   <input type="hidden" value="dltacc" name="dltac">
+                   <input type="submit" class="btn btn-danger" value="Yes, Delete">
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+      
                           <div class="modal video-modal fade" id="email">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
